@@ -1,0 +1,30 @@
+.container {
+  max-width: 60rem;
+}
+
+.img-container {
+  border: 1px solid #000;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.card {
+  margin-bottom: 1.25rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+h1, h2, h3, h4, h5 {
+  margin-bottom: 1.25rem;
+}
+
+button {
+  margin-top: 0.625rem;
+}
