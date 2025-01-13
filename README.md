@@ -12,8 +12,8 @@
 1. Sklonuj repozytorium:
 
    ```bash
-   git clone https://github.com/your-repo/simple-online-store.git
-   cd simple-online-store
+   git clone https://github.com/LukaszCheciak/Web-Shop.git
+   cd Web-Shop
 
    ```
 
@@ -26,6 +26,16 @@ npm install
 npm run dev
 
 4. kliknij w link który pojawi się w terminalu będzie on w postaci np.: http://localhost:3000
+
+### Dostępni użytkownicy
+
+| Username    | Password       |
+|-------------|----------------|
+| Lukasz      | Lukasz123      |
+| Nauczyciel  | Nauczyciel123  |
+| Wojciech    | Wojciech123    |
+| Jarek       | Jarek123       |
+| admin       | admin          |
 
 ## Użyta technologia + biblioteki
 
