@@ -2,19 +2,17 @@
   text-align: center;
 }
 
-.App-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  background-color: #282c34;
-  color: white;
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #f3f3f3!important;
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
 }
 
-.login-panel {
-  position: absolute;
-  top: 10px;
-  left: 10px;
+.search-bar {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .product-list {
@@ -29,13 +27,37 @@
   border-radius: 4px;
   padding: 20px;
   margin: 10px;
-  width: 200px;
+  width: 100%;
   text-align: left;
 }
 
 .product-card img {
   max-width: 100%;
   height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.card-img-container {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  overflow: hidden;
+}
+
+.card-img-container img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.card-divider {
+  border-top: 1px solid #ddd;
+  margin: 1rem 0;
 }
 
 input[type="text"] {
@@ -59,4 +81,45 @@ button {
   margin: 10px;
   padding: 10px 20px;
   font-size: 16px;
+}
+
+.navbar-img {
+  width: 2rem;
+  height: 2.2rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.brand {
+  font-size: 2rem;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-weight: bold;
+}
+
+a, a:visited, a:active, a:hover {
+  text-decoration: none;
+  color: black;
+}
+
+button {
+  background-color: #f8f9fa;
+  border: 1px solid #f8f9fa;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cart-badge {
+  background-color: red;
+  color: white;
+  padding: 0.1rem 0.4rem;
+  border-radius: 50%;
+  left: -1rem!important;
+  top: -0.8rem!important;
+  position: relative;
+}
+
+.btn-primary {
+  color: white !important;
 }
