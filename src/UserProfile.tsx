@@ -8,7 +8,7 @@ interface UserProfileProps {
   updateShippingInfo: (info: ShippingInfo) => void;
   shippingInfo: ShippingInfo;
   loadCart: (cart: CartItem[]) => void;
-  orders: { [username: string]: any[] };
+  orders: { [username: string]: any[] }; // Dodaj zamówienia do propsów
   handleLogout: () => void;
 }
 
