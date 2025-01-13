@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import './Cart.css';
 
 interface CartItem {
   id: number;
@@ -31,33 +32,53 @@ const Cart: React.FC<CartProps> = ({
   );
 
   return (
-    <div>
-      <h1>Shopping Cart</h1>
+    <div className="container mt-5">
+      <h1 className="text-center mb-4">Shopping Cart</h1>
       <Link to="/">
-        <button>Back to Store</button>
+        <button className="btn btn-secondary mb-4">Back to Store</button>
       </Link>
       {cartItems.length === 0 ? (
         <p>Your cart is empty</p>
       ) : (
         <div>
-          {cartItems.map((item) => (
-            <div key={item.id}>
-              <h2>{item.title}</h2>
-              <p>Quantity: {item.quantity}</p>
-              <p>Price: ${item.price}</p>
-              <button onClick={() => decreaseQuantity(item.id)}>
-                Remove One
-              </button>
-              <button onClick={() => removeFromCart(item.id)}>
-                Remove All
-              </button>
-            </div>
-          ))}
-          <h2>Total Price: ${totalPrice.toFixed(2)}</h2>
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cartItems.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.title}</td>
+                  <td>{item.quantity}</td>
+                  <td>${item.price.toFixed(2)}</td>
+                  <td>
+                    <button
+                      className="btn btn-warning btn-sm me-2"
+                      onClick={() => decreaseQuantity(item.id)}
+                    >
+                      Remove One
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      Remove All
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <h2 className="text-end">Total Price: ${totalPrice.toFixed(2)}</h2>
           {loggedInUser ? (
-            <button onClick={placeOrder}>Place Order</button>
+            <button className="btn btn-primary w-100 mt-3" onClick={placeOrder}>Place Order</button>
           ) : (
-            <p>You must be logged in to place an order</p>
+            <p className="text-danger">You must be logged in to place an order</p>
           )}
         </div>
       )}
