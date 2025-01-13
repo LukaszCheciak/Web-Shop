@@ -5,7 +5,9 @@
 #    pip-compile --output-file=base.txt base.in
 #
 asgiref==3.8.1
-    # via django
+    # via
+    #   django
+    #   django-cors-headers
 asttokens==3.0.0
     # via stack-data
 certifi==2024.12.14
@@ -25,6 +27,7 @@ defusedxml==0.8.0rc2
 django==5.1.4
     # via
     #   -r base.in
+    #   django-cors-headers
     #   django-extensions
     #   django-filter
     #   django-jazzmin
@@ -33,6 +36,8 @@ django==5.1.4
     #   djoser
     #   drf-yasg
     #   social-auth-app-django
+django-cors-headers==4.6.0
+    # via -r base.in
 django-extensions==3.2.3
     # via -r base.in
 django-filter==24.3
@@ -80,6 +85,8 @@ parso==0.8.4
     # via jedi
 pexpect==4.9.0
     # via ipython
+pillow==11.1.0
+    # via -r base.in
 prompt-toolkit==3.0.48
     # via ipython
 psycopg2-binary==2.9.10

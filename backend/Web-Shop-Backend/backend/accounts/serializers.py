@@ -10,3 +10,15 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "username",
         )
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = (
+            "id",
+            "username",
+            "address",
+            "city",
+            "postal_code",
+        )

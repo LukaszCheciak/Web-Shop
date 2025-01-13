@@ -8,6 +8,7 @@ asgiref==3.8.1
     # via
     #   -r base.txt
     #   django
+    #   django-cors-headers
     #   django-stubs
 asttokens==3.0.0
     # via
@@ -47,6 +48,7 @@ distlib==0.3.9
 django==5.1.4
     # via
     #   -r base.txt
+    #   django-cors-headers
     #   django-extensions
     #   django-filter
     #   django-jazzmin
@@ -57,6 +59,8 @@ django==5.1.4
     #   djoser
     #   drf-yasg
     #   social-auth-app-django
+django-cors-headers==4.6.0
+    # via -r base.txt
 django-extensions==3.2.3
     # via -r base.txt
 django-filter==24.3
@@ -148,6 +152,8 @@ pexpect==4.9.0
     # via
     #   -r base.txt
     #   ipython
+pillow==11.1.0
+    # via -r base.txt
 platformdirs==4.3.6
     # via virtualenv
 pluggy==1.5.0

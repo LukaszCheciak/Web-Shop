@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 from environs import Env
@@ -37,10 +38,13 @@ THIRD_PARTY_APPS = [
     "djoser",
     "rest_framework_simplejwt",
     "django_extensions",
+    "corsheaders",
 ]
 
 LOCAL_APPS = [
     "backend.accounts.apps.AccountsConfig",
+    "backend.orders.apps.OrdersConfig",
+    "backend.products.apps.ProductsConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -51,6 +55,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -137,3 +142,9 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1800),
+}
+
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
