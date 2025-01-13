@@ -8,7 +8,8 @@ interface UserProfileProps {
   updateShippingInfo: (info: ShippingInfo) => void;
   shippingInfo: ShippingInfo;
   loadCart: (cart: CartItem[]) => void;
-  orders: { [username: string]: any[] }; // Dodaj zamówienia do propsów
+  orders: { [username: string]: any[] };
+  handleLogout: () => void;
 }
 
 interface CartItem {
@@ -31,6 +32,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
   shippingInfo,
   loadCart,
   orders,
+  handleLogout,
 }) => {
   const [editMode, setEditMode] = useState(false);
   const [address, setAddress] = useState(shippingInfo.address);
@@ -51,10 +53,12 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   return (
     <div className="container mt-4">
-      <h1 className="text-center">User Profile</h1>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1 className="text-center">User Profile</h1>
+      </div>
       <div className="card mb-5">
         <div className="card-body px-5 d-flex flex-column align-items-start">
-          <h3><b>Username:</b> {username}</h3>
+          <h3>Welcome, <b>{username} </b> </h3>
           <h3><b>Shipping information:</b></h3>
           <table className="table">
             <thead>
@@ -66,51 +70,52 @@ const UserProfile: React.FC<UserProfileProps> = ({
             </thead>
             <tbody>
               <tr>
-              {editMode ? (
-                <>
-                  <td>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="Address"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      placeholder="City"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value)}
-                      placeholder="Postal Code"
-                    />
-                  </td>
-                </>
-              ) : (
-                <>
-                  <td>{address}</td>
-                  <td>{city}</td>
-                  <td>{postalCode}</td>
-                </>
-              )}
-            </tr>
-          </tbody>
-        </table>
-        {editMode ? (
-          <button className="btn btn-primary" onClick={handleSave}>Save</button>
-        ) : (
-          <button className="btn btn-secondary" onClick={() => setEditMode(true)}>Edit</button>
-        )}
+                {editMode ? (
+                  <>
+                    <td>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Address"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder="City"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value)}
+                        placeholder="Postal Code"
+                      />
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td>{address}</td>
+                    <td>{city}</td>
+                    <td>{postalCode}</td>
+                  </>
+                )}
+              </tr>
+            </tbody>
+          </table>
+          {editMode ? (
+            <button className="btn btn-primary w-100 ms-0" onClick={handleSave}>Save shipping info</button>
+          ) : (
+            <button className="btn btn-secondary w-100 ms-0" onClick={() => setEditMode(true)}>Edit shipping info</button>
+          )}
+          <button className="btn btn-danger w-100 ms-0" onClick={handleLogout}>Logout</button>
         </div>
       </div>
       <h2>Saved Carts</h2>
@@ -130,58 +135,59 @@ const UserProfile: React.FC<UserProfileProps> = ({
             </div>
           </div>
         ))
-        )}
-        <h2>Order History</h2>
-        {orders[username] && orders[username].length > 0 ? (
-          orders[username].map((order, index) => (
-            <div key={index} className="card mb-5">
-              <div className="card-body px-5 d-flex flex-column align-items-start">
-                <h3><b>Order #{index + 1}</b></h3>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Address</th>
-                      <th>City</th>
-                      <th>Postal Code</th>
+      )}
+      <h2>Order History</h2>
+      {orders[username] && orders[username].length > 0 ? (
+        orders[username].map((order, index) => (
+          <div key={index} className="card mb-5">
+            <div className="card-body px-5 d-flex flex-column align-items-start">
+              <h3><b>Order #{index + 1}</b></h3>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Address</th>
+                    <th>City</th>
+                    <th>Postal Code</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{new Date(order.date).toLocaleString()}</td>
+                    <td>{order.shippingInfo.address}</td>
+                    <td>{order.shippingInfo.city}</td>
+                    <td>{order.shippingInfo.postalCode}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h4><b>Items:</b></h4>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {order.items.map((item: CartItem) => (
+                    <tr key={item.id}>
+                      <td>{item.title}</td>
+                      <td>{item.quantity}</td>
+                      <td>${item.price.toFixed(2)}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{new Date(order.date).toLocaleString()}</td>
-                      <td>{order.shippingInfo.address}</td>
-                      <td>{order.shippingInfo.city}</td>
-                      <td>{order.shippingInfo.postalCode}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <h4><b>Items:</b></h4>
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Title</th>
-                      <th>Quantity</th>
-                      <th>Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {order.items.map((item: CartItem) => (
-                      <tr key={item.id}>
-                        <td>{item.title}</td>
-                        <td>{item.quantity}</td>
-                        <td>${item.price.toFixed(2)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))
-        ) : (
-          <p>No orders yet</p>
-        )}
-        </div>
-        );
-        };
-        
-        export default UserProfile;
+          </div>
+        ))
+      ) : (
+        <p>No orders yet</p>
+      )}
+      <button className="btn btn-secondary mt-4" onClick={() => navigate("/")}>Back to Store</button>
+    </div>
+  );
+};
+
+export default UserProfile;
