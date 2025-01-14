@@ -27,6 +27,42 @@ npm run dev
 
 4. kliknij w link który pojawi się w terminalu będzie on w postaci np.: http://localhost:3000
 
+5. W folderze z backendem należy wykonać komendę:
+
+   ```bash
+   docker compose up postgres -d
+   ```
+
+6. Należy utworzyć wirtualne środowisko Pythona:
+
+    ```bash
+    python -m venv venv
+    pip install -r requirements/dev.txt
+    ```
+
+
+7. Następnie należy zaaplikować migrację:
+    
+    ```bash
+    python manage.py migrate
+    ```
+
+8. Następnie należy utworzyć superusera:
+
+    ```bash
+    python manage.py createsuperuser
+    ```
+
+9. Następnie należy uruchomić serwer:
+
+    ```bash
+    python manage.py runserver
+    ```
+   
+10. Następnie należy wejść na stronę:
+
+http://localhost:8000/admin
+
 ### Dostępni użytkownicy
 
 | Username    | Password       |
