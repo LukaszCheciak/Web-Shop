@@ -1,0 +1,107 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    ".eggs",
+    ".tox",
+]
+[tool.ruff.lint]
+ignore = [
+    # flake8-builtins
+    # the likelihood of running into an issue when shadowing a buildin
+    # with a class attribute is very low
+    "A003",
+    # flake8-bugbear
+    # fastapi recommends to use `Depend()` as an argument default.
+    # Unfortunately, exceptions are hardcoded in bugbear.
+    # https://github.com/PyCQA/flake8-bugbear/issues/62
+    "B008",
+]
+select = [
+    "A", # flake8 builtins
+    "E", # pycodestyle error
+    "W", # pycodestyle warning
+    "F", # pyflakes
+    "N", # pep8-naming
+    "UP", # pyupgrade
+    "B", # flake8-bugbear
+    "I", # isort
+    "C4", # flake8-comprehensions
+    "T10", # flake8-debugger
+    "ERA", # flake8-eradicate
+    "G", # flake8-logging-format
+    "C9", # mccabe
+]
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = [
+    "S101",     # "Use of `assert` detected"
+    "ARG",      # "Unused function argument". Fixtures are often unused.
+    "S105",     # "Possible hardcoded password".
+]
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pep8-naming]
+classmethod-decorators = [
+    "classmethod",
+    "pydantic.validator",
+    "pydantic.root_validator",
+]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:"
+]
+omit = [
+    "**/fixtures.py",
+    "manage.py",
+    "**/wsgi.py",
+    "**/settings/*.py",
+    "**/migrations/*.py",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "backend.settings.tests"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+norecursedirs = ["deployment*",
+                 ".git/*",
+                 ".mypy_cache/*",
+                 ".pytest_cache/*",
+                 "migrations/*",
+                 "settings/*",
+]
+addopts = "--nomigrations"
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+check_untyped_defs = true
+
+[tool.django-stubs]
+django_settings_module = "backend.settings.local"
+
+[[tool.mypy.overrides]]
+module = [
+    "*.migrations.*",
+    "*.settings.*",
+    "*.tests.*"
+]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "factory.*"
+ignore_missing_imports = true
+[[tool.mypy.overrides]]
+module = "rest_framework.*"
+ignore_missing_imports = true
+[[tool.mypy.overrides]]
+module = "django_extensions.*"
+ignore_missing_imports = true

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 interface CartItem {
   id: number;
@@ -25,6 +25,12 @@ const Cart: React.FC<CartProps> = ({
   loggedInUser,
   placeOrder,
 }) => {
+  const navigate = useNavigate();
+
+  if (!sessionStorage.getItem("user")) {
+    navigate("/login");
+  }
+
   const totalPrice = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0

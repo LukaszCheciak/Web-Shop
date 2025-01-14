@@ -1,68 +1,34 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import axiosInstance from './axiosInstance.ts';
+import { useNavigate } from 'react-router-dom';
 
-const users = [
-  { username: "Lukasz", password: "Lukasz123" },
-  { username: "Nauczyciel", password: "Nauczyciel123" },
-  { username: "Wojciech", password: "Wojciech123" },
-  { username: "Jarek", password: "Jarek123" },
-  { username: "admin", password: "admin" },
-];
-
-interface LoginProps {
-  setLoggedInUser: (username: string | null) => void;
-  setCartItems: (items: CartItem[]) => void;
-}
-
-interface CartItem {
-  id: number;
-  title: string;
-  price: number;
-  quantity: number;
-}
-
-const Login: React.FC<LoginProps> = ({ setLoggedInUser, setCartItems }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+const Login: React.FC = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    const user = users.find(
-      (u) => u.username === username && u.password === password
-    );
-    if (user) {
-      localStorage.setItem("loggedInUser", username);
-      setLoggedInUser(username);
-      const lastCart = localStorage.getItem("lastCart");
-      if (lastCart) {
-        setCartItems(JSON.parse(lastCart));
-      }
-      navigate("/");
-    } else {
-      setError("Invalid username or password");
+  const handleLogin = async () => {
+  try {
+    const response = await axiosInstance.post('/accounts/jwt/create/', { username, password });
+    sessionStorage.setItem('token', response.data.access);
+    const userResponse = await axiosInstance.get('/accounts/users/me/');
+    console.log(userResponse);
+    sessionStorage.setItem('user', JSON.stringify(userResponse.data.username));
+    navigate('/');
+    location.reload();
+    } catch {
+      setError('An error occurred while trying to log in. Please try again.');
     }
-  };
+};
 
   return (
     <div>
-      <h1>Login</h1>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+      <h2>Login</h2>
+      <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
       <button onClick={handleLogin}>Login</button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <button onClick={() => navigate("/")}>Back to Store</button>
-      <button onClick={() => navigate("/cart")}>Go to Cart</button>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 };

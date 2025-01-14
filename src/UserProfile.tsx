@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "./axiosInstance.ts";
 
 interface UserProfileProps {
   username: string;
@@ -7,7 +8,6 @@ interface UserProfileProps {
   updateShippingInfo: (info: ShippingInfo) => void;
   shippingInfo: ShippingInfo;
   loadCart: (cart: CartItem[]) => void;
-  orders: { [username: string]: any[] }; // Dodaj zamówienia do propsów
 }
 
 interface CartItem {
@@ -23,19 +23,44 @@ interface ShippingInfo {
   postalCode: string;
 }
 
+interface Order {
+  items: CartItem[];
+  total: number;
+  date: string;
+}
+
 const UserProfile: React.FC<UserProfileProps> = ({
   username,
   savedCarts,
   updateShippingInfo,
   shippingInfo,
   loadCart,
-  orders,
 }) => {
   const [editMode, setEditMode] = useState(false);
   const [address, setAddress] = useState(shippingInfo.address);
   const [city, setCity] = useState(shippingInfo.city);
   const [postalCode, setPostalCode] = useState(shippingInfo.postalCode);
+  const [errors, setErrors] = useState<{ address?: string; city?: string; postalCode?: string }>({});
   const navigate = useNavigate();
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  if (!username) {
+    navigate("/login");
+  }
+
+  useEffect(() => {
+    axios.get(`/profile/orders`).then((response) => {
+      console.log(response);
+      setOrders(response.data);
+    });
+  }, [username]);
+
+  useEffect(() => {
+    axios.get(`/profile/shipping_info`).then((response) => {
+      console.log(response);
+      updateShippingInfo(response.data);
+    });
+  }, [address, city, postalCode]);
 
   useEffect(() => {
     setAddress(shippingInfo.address);
@@ -43,7 +68,36 @@ const UserProfile: React.FC<UserProfileProps> = ({
     setPostalCode(shippingInfo.postalCode);
   }, [shippingInfo]);
 
+  const validateAddress = (address: string) => {
+    if (!address) return "Address is required.";
+    return "";
+  };
+
+  const validateCity = (city: string) => {
+    if (!city) return "City is required.";
+    return "";
+  };
+
+  const validatePostalCode = (postalCode: string) => {
+    if (!postalCode) return "Postal code is required.";
+    if (!/^\d{5}$/.test(postalCode)) return "Postal code must be 5 digits.";
+    return "";
+  };
+
   const handleSave = () => {
+    const addressError = validateAddress(address);
+    const cityError = validateCity(city);
+    const postalCodeError = validatePostalCode(postalCode);
+
+    if (addressError || cityError || postalCodeError) {
+      setErrors({ address: addressError, city: cityError, postalCode: postalCodeError });
+      return;
+    }
+
+    axios.post(`/profile/update_shipping_info/`, { address, city, postal_code: postalCode })
+      .then((response) => {
+        console.log(response);
+      });
     updateShippingInfo({ address, city, postalCode });
     setEditMode(false);
   };
@@ -61,18 +115,21 @@ const UserProfile: React.FC<UserProfileProps> = ({
             onChange={(e) => setAddress(e.target.value)}
             placeholder="Address"
           />
+          {errors.address && <p style={{ color: "red" }}>{errors.address}</p>}
           <input
             type="text"
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="City"
           />
+          {errors.city && <p style={{ color: "red" }}>{errors.city}</p>}
           <input
             type="text"
             value={postalCode}
             onChange={(e) => setPostalCode(e.target.value)}
             placeholder="Postal Code"
           />
+          {errors.postalCode && <p style={{ color: "red" }}>{errors.postalCode}</p>}
           <button onClick={handleSave}>Save</button>
         </div>
       ) : (
@@ -102,14 +159,11 @@ const UserProfile: React.FC<UserProfileProps> = ({
         ))
       )}
       <h2>Order History</h2>
-      {orders[username] && orders[username].length > 0 ? (
-        orders[username].map((order, index) => (
+      {orders && orders.length > 0 ? (
+        orders.map((order, index) => (
           <div key={index}>
             <h3>Order {index + 1}</h3>
-            <p>Date: {new Date(order.date).toLocaleString()}</p>
-            <p>Address: {order.shippingInfo.address}</p>
-            <p>City: {order.shippingInfo.city}</p>
-            <p>Postal Code: {order.shippingInfo.postalCode}</p>
+            <p>Date: {order.date}</p>
             <h4>Items:</h4>
             {order.items.map((item: CartItem) => (
               <div key={item.id}>

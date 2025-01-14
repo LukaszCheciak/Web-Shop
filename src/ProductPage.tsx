@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "./axiosInstance.ts";
 
 interface Product {
   id: number;
@@ -21,29 +22,56 @@ interface Review {
 interface ProductPageProps {
   products: Product[];
   loggedInUser: string | null;
-  addReview: (productId: number, review: Review) => void;
-  reviews: { [productId: number]: Review[] };
   updateProductStock: (productId: number, newStock: number) => void;
-  addToCart: (product: Product, quantity: number) => void; // Dodaj funkcję do dodawania do koszyka
+  addToCart: (product: Product, quantity: number) => void;
 }
 
 const ProductPage: React.FC<ProductPageProps> = ({
   products,
   loggedInUser,
-  addReview,
-  reviews,
   updateProductStock,
   addToCart,
 }) => {
   const { productId } = useParams<{ productId: string }>();
   const product = products.find((p) => p.id === parseInt(productId!));
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [rating, setRating] = useState(1);
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewContent, setReviewContent] = useState("");
   const [error, setError] = useState("");
-  const [quantity, setQuantity] = useState(1); // Dodaj stan dla ilości produktu
-  const [newStock, setNewStock] = useState(product?.stock || 0); // Dodaj stan dla nowej liczebności produktów
+  const [quantity, setQuantity] = useState(1);
+  const [newStock, setNewStock] = useState(product?.stock || 0);
   const navigate = useNavigate();
+  const [canReview, setCanReview] = useState(() => {
+    if (product) {
+      axios.get(`/products/${product.id}/can_review/`).then((response) => {
+        setCanReview(response.data.can_review);
+      });
+    }
+  });
+
+  useEffect(() => {
+    if (product) {
+      axios.get(`/products/${product.id}/reviews/`).then((response) => {
+        console.log(response);
+        response.data.map((review: Review) => {
+          setReviews((prevReviews) => [...prevReviews, review]);
+        });
+      });
+    }
+  }, [product]);
+
+  const addReview = (productId: number, review: Review) => {
+    axios
+      .post("/reviews/submit_review/", {product: productId, rating: review.rating, title: review.title, content: review.content})
+      .then((response) => {
+        console.log("Review added:", response);
+        setReviews((prevReviews) => [...prevReviews, review]);
+      })
+      .catch((error) => {
+        console.error("Error adding review:", error);
+      });
+  };
 
   if (!product) {
     return <p>Product not found</p>;
@@ -91,8 +119,8 @@ const ProductPage: React.FC<ProductPageProps> = ({
       <p>{product.description}</p>
       <p>Available: {product.stock}</p> {/* Wyświetl dostępność produktu */}
       <h2>Reviews</h2>
-      {reviews[product.id] && reviews[product.id].length > 0 ? (
-        reviews[product.id].map((review, index) => (
+      {product && reviews.length > 0 ? (
+        reviews.map((review: Review, index: number) => (
           <div key={index}>
             <h3>{review.title}</h3>
             <p>Rating: {review.rating} stars</p>
@@ -103,7 +131,7 @@ const ProductPage: React.FC<ProductPageProps> = ({
       ) : (
         <p>No reviews yet</p>
       )}
-      {loggedInUser ? (
+      {loggedInUser && canReview ? (
         <div>
           <h2>Leave a Review</h2>
           <label htmlFor="rating">Rating:</label>
@@ -133,9 +161,12 @@ const ProductPage: React.FC<ProductPageProps> = ({
           <button onClick={handleAddReview}>Submit Review</button>
           {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
-      ) : (
+      ) : !loggedInUser ? (
         <p>You must be logged in to leave a review</p>
-      )}
+      ) : (
+        <p>You have already reviewed this product</p>
+        )
+      }
       <div>
         <h2>Add to Cart</h2>
         <label htmlFor="quantity">Quantity:</label>

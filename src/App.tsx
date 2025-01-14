@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "./axiosInstance.ts";
 import { Route, Link, Routes } from "react-router-dom";
 import Cart from "./Cart";
 import Login from "./Login";
 import UserProfile from "./UserProfile";
 import ProductPage from "./ProductPage";
 import "./App.css";
+import Register from "./Register.tsx";
 
 interface Product {
   id: number;
@@ -15,6 +16,14 @@ interface Product {
   category: string;
   image: string;
   stock: number;
+}
+
+interface Review {
+  id: number;
+  username: string;
+  rating: number;
+  title: string;
+  content: string;
 }
 
 interface CartItem {
@@ -28,13 +37,6 @@ interface ShippingInfo {
   address: string;
   city: string;
   postalCode: string;
-}
-
-interface Review {
-  username: string;
-  rating: number;
-  title: string;
-  content: string;
 }
 
 const App: React.FC = () => {
@@ -53,17 +55,8 @@ const App: React.FC = () => {
       ? JSON.parse(savedShippingInfo)
       : { address: "", city: "", postalCode: "" };
   });
-  const [reviews, setReviews] = useState<{ [productId: number]: Review[] }>(
-    () => {
-      const savedReviews = localStorage.getItem("reviews");
-      return savedReviews ? JSON.parse(savedReviews) : {};
-    }
-  );
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loggedInUser, setLoggedInUser] = useState<string | null>(
-    localStorage.getItem("loggedInUser")
-  );
   const [orders, setOrders] = useState<{ [username: string]: any[] }>(() => {
     const savedOrders = localStorage.getItem("orders");
     return savedOrders ? JSON.parse(savedOrders) : {};
@@ -71,12 +64,9 @@ const App: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get("https://fakestoreapi.com/products")
+      .get("/products/")
       .then((response) => {
-        const productsWithStock = response.data.map((product: Product) => ({
-          ...product,
-          stock: 5,
-        }));
+        const productsWithStock = response.data;
         setProducts(productsWithStock);
         setLoading(false);
       })
@@ -99,12 +89,12 @@ const App: React.FC = () => {
   }, [shippingInfo]);
 
   useEffect(() => {
-    localStorage.setItem("reviews", JSON.stringify(reviews));
-  }, [reviews]);
-
-  useEffect(() => {
     localStorage.setItem("orders", JSON.stringify(orders));
   }, [orders]);
+
+  const loggedInUser = () => {
+    return sessionStorage.getItem("user");
+  }
 
   const addToCart = (product: Product, quantity: number) => {
     setCartItems((prevItems) => {
@@ -150,13 +140,6 @@ const App: React.FC = () => {
     setShippingInfo(info);
   };
 
-  const addReview = (productId: number, review: Review) => {
-    setReviews((prevReviews) => {
-      const productReviews = prevReviews[productId] || [];
-      return { ...prevReviews, [productId]: [...productReviews, review] };
-    });
-  };
-
   const updateProductStock = (productId: number, newStock: number) => {
     setProducts((prevProducts) =>
       prevProducts.map((product) =>
@@ -165,29 +148,20 @@ const App: React.FC = () => {
     );
   };
 
+  const totalPrice = cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+
   const placeOrder = () => {
-    if (!loggedInUser) return;
+    if (!loggedInUser()) return;
 
-    const newOrder = {
-      date: new Date().toISOString(),
-      items: cartItems,
-      shippingInfo,
-    };
-
-    setProducts((prevProducts) =>
-      prevProducts.map((product) => {
-        const cartItem = cartItems.find((item) => item.id === product.id);
-        if (cartItem) {
-          return { ...product, stock: product.stock - cartItem.quantity };
-        }
-        return product;
-      })
+    axios
+      .post("/orders/", { items: cartItems, total: totalPrice })
+      .then((response) => {
+        console.log("Order placed:", response);
+      }
     );
-
-    setOrders((prevOrders) => ({
-      ...prevOrders,
-      [loggedInUser]: [...(prevOrders[loggedInUser] || []), newOrder],
-    }));
 
     setCartItems([]);
   };
@@ -202,34 +176,41 @@ const App: React.FC = () => {
   );
 
   const handleLogout = () => {
-    localStorage.setItem("lastCart", JSON.stringify(cartItems)); // Zapisz koszyk w localStorage
-    localStorage.removeItem("loggedInUser");
-    setLoggedInUser(null);
-    setCartItems([]); // Resetuj koszyk
+    localStorage.setItem("lastCart", JSON.stringify(cartItems));
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    setCartItems([]);
   };
 
   return (
     <div className="App">
       <header className="App-header">
         <div className="login-panel">
-          {loggedInUser ? (
-            <>
-              <span>Welcome, {loggedInUser}</span>
-              <Link to="/profile">
-                <button>Profile</button>
-              </Link>
-              <button onClick={handleLogout}>Logout</button>
-            </>
+          {loggedInUser() ? (
+              <>
+                <span>Welcome, {loggedInUser()}</span>
+                <Link to="/profile">
+                  <button>Profile</button>
+                </Link>
+                <button onClick={handleLogout}>Logout</button>
+              </>
           ) : (
-            <Link to="/login">
-              <button>Login</button>
-            </Link>
+              <>
+                <Link to="/login">
+                  <button>Login</button>
+                </Link>
+                <Link to="/register">
+                  <button>Register</button>
+                </Link>
+              </>
           )}
         </div>
         <h1>Simple Online Store</h1>
-        <Link to="/cart">
-          <button>Cart ({totalItems})</button>
-        </Link>
+        {loggedInUser() ? (
+          <Link to="/cart">
+            <button>Cart ({totalItems})</button>
+          </Link>
+        ) : null}
       </header>
       <main>
         <Routes>
@@ -241,30 +222,33 @@ const App: React.FC = () => {
                 removeFromCart={removeFromCart}
                 decreaseQuantity={decreaseQuantity}
                 saveCart={saveCart}
-                loggedInUser={loggedInUser}
-                placeOrder={placeOrder} // Przekaż funkcję realizacji zamówienia
+                loggedInUser={loggedInUser()}
+                placeOrder={placeOrder}
               />
             }
           />
           <Route
             path="/login"
             element={
-              <Login
-                setLoggedInUser={setLoggedInUser}
-                setCartItems={setCartItems}
-              />
+              <Login/>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <Register/>
             }
           />
           <Route
             path="/profile"
             element={
               <UserProfile
-                username={loggedInUser!}
+                username={loggedInUser()}
                 savedCarts={savedCarts}
                 updateShippingInfo={updateShippingInfo}
                 shippingInfo={shippingInfo}
                 loadCart={loadCart}
-                orders={orders} // Przekaż zamówienia
+                orders={orders}
               />
             }
           />
@@ -273,9 +257,7 @@ const App: React.FC = () => {
             element={
               <ProductPage
                 products={products}
-                loggedInUser={loggedInUser}
-                addReview={addReview}
-                reviews={reviews}
+                loggedInUser={loggedInUser()}
                 updateProductStock={updateProductStock}
                 addToCart={addToCart} // Przekaż funkcję dodawania do koszyka
               />
