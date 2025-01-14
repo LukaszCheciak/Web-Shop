@@ -62,6 +62,9 @@ npm run dev
 
 ### Autorzy
 
-- Łukasz Checiak
+- Łukasz Checiak:
+  React
 - Wojciech Bartoszek
+   css, bootstrap
 - Jarosław Kołdun
+  django, postgres
