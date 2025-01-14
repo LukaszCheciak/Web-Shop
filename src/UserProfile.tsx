@@ -61,9 +61,10 @@ const UserProfile: React.FC<UserProfileProps> = ({
   useEffect(() => {
     axios.get(`/profile/shipping_info`).then((response) => {
       console.log(response);
-      updateShippingInfo(response.data);
+      updateShippingInfo({address: response.data.address, city: response.data.city, postalCode: response.data.postal_code});
+      console.log(shippingInfo);
     });
-  }, [address, city, postalCode]);
+  }, []);
 
   useEffect(() => {
     setAddress(shippingInfo.address);
@@ -231,7 +232,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                     <tr key={item.id}>
                       <td>{item.title}</td>
                       <td>{item.quantity}</td>
-                      <td>${item.price.toFixed(2)}</td>
+                      <td>{item.price}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -32,3 +32,14 @@ class ProfileViewSet(GenericViewSet):
         user.save()
         return Response({"message": "Shipping info updated"})
 
+    @action(detail=False, methods=["get"])
+    def shipping_info(self, request, *args, **kwargs):
+        user = request.user
+        return Response(
+            {
+                "address": user.address,
+                "city": user.city,
+                "postal_code": user.postal_code,
+            }
+        )
+

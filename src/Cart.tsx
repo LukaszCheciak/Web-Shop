@@ -61,7 +61,7 @@ const Cart: React.FC<CartProps> = ({
                 <tr key={item.id}>
                   <td>{item.title}</td>
                   <td>{item.quantity}</td>
-                  <td>${item.price.toFixed(2)}</td>
+                  <td>{item.price}</td>
                   <td>
                     <button
                       className="btn btn-warning btn-sm me-2"
@@ -80,7 +80,7 @@ const Cart: React.FC<CartProps> = ({
               ))}
             </tbody>
           </table>
-          <h2 className="text-end">Total Price: ${totalPrice.toFixed(2)}</h2>
+          <h2 className="text-end">Total Price: ${totalPrice}</h2>
           {loggedInUser ? (
             <button className="btn btn-primary w-100 mt-3" onClick={placeOrder}>Place Order</button>
           ) : (
