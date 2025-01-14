@@ -9,7 +9,6 @@ interface UserProfileProps {
   updateShippingInfo: (info: ShippingInfo) => void;
   shippingInfo: ShippingInfo;
   loadCart: (cart: CartItem[]) => void;
-  orders: { [username: string]: any[] }; // Dodaj zamówienia do propsów
   handleLogout: () => void;
 }
 
@@ -38,7 +37,6 @@ const UserProfile: React.FC<UserProfileProps> = ({
   updateShippingInfo,
   shippingInfo,
   loadCart,
-  orders,
   handleLogout,
 }) => {
   const [editMode, setEditMode] = useState(false);
@@ -213,9 +211,9 @@ const UserProfile: React.FC<UserProfileProps> = ({
                 <tbody>
                   <tr>
                     <td>{new Date(order.date).toLocaleString()}</td>
-                    <td>{order.shippingInfo.address}</td>
-                    <td>{order.shippingInfo.city}</td>
-                    <td>{order.shippingInfo.postalCode}</td>
+                    <td>{address}</td>
+                    <td>{city}</td>
+                    <td>{postalCode}</td>
                   </tr>
                 </tbody>
               </table>
