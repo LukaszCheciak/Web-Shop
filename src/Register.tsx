@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from './axiosInstance.ts';
 import { useNavigate } from 'react-router-dom';
+import './Register.css';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -26,13 +27,46 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      <input type="password" placeholder="Confirm password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-      <button onClick={handleRegister}>Register</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-body d-flex flex-column align-items-center">
+              <h1 className="text-center">Register</h1>
+              <div className="mb-2 w-100">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="mb-2 w-100">
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="mb-2 w-100">
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Confirm password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
+              <button className="btn btn-primary w-100 mb-3" onClick={handleRegister}>Register</button>
+              {error && <p style={{ color: 'red' }}>{error}</p>}
+              <button className="btn btn-secondary w-100" onClick={() => navigate("/login")}>Back to Login</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

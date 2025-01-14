@@ -9,18 +9,18 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-  try {
-    const response = await axiosInstance.post('/accounts/jwt/create/', { username, password });
-    sessionStorage.setItem('token', response.data.access);
-    const userResponse = await axiosInstance.get('/accounts/users/me/');
-    console.log(userResponse);
-    sessionStorage.setItem('user', JSON.stringify(userResponse.data.username));
-    navigate('/');
-    location.reload();
+    try {
+      const response = await axiosInstance.post('/accounts/jwt/create/', { username, password });
+      sessionStorage.setItem('token', response.data.access);
+      const userResponse = await axiosInstance.get('/accounts/users/me/');
+      console.log(userResponse);
+      sessionStorage.setItem('user', JSON.stringify(userResponse.data.username));
+      navigate('/');
+      location.reload();
     } catch {
       setError('An error occurred while trying to log in. Please try again.');
     }
-};
+  };
 
   return (
     <div className="container mt-5">
@@ -49,11 +49,12 @@ const Login: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              {error && <p className="text-danger text-center">{error}</p>}
-              <button className="btn btn-primary w-100 mb-3" onClick={handleLogin}>Login</button>
+              <button className="btn btn-primary w-100" onClick={handleLogin}>Login</button>
               {error && <p style={{ color: 'red' }}>{error}</p>}
-              <button className="btn btn-secondary w-100 mb-3" onClick={() => navigate("/")}>Back to Store</button>
+              <button className="btn btn-secondary w-100" onClick={() => navigate("/register")}>Register</button>
+              <button className="btn btn-secondary w-100" onClick={() => navigate("/")}>Back to Store</button>
               <button className="btn btn-secondary w-100" onClick={() => navigate("/cart")}>Go to Cart</button>
+
             </div>
           </div>
         </div>
