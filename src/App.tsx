@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import axios from "./axiosInstance.ts";
-import { Route, Link, Routes } from "react-router-dom";
+import { Route, Link, Routes, useNavigate } from "react-router-dom";
 import Cart from "./Cart";
 import Login from "./Login";
 import UserProfile from "./UserProfile";
 import ProductPage from "./ProductPage";
 import "./App.css";
+import logo from "./assets/logo.png";
+import cart from "./assets/cart.png";
+import user from "./assets/user.png";
 import Register from "./Register.tsx";
 
 interface Product {
@@ -61,6 +67,8 @@ const App: React.FC = () => {
     const savedOrders = localStorage.getItem("orders");
     return savedOrders ? JSON.parse(savedOrders) : {};
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -180,38 +188,98 @@ const App: React.FC = () => {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
     setCartItems([]);
+    navigate("/login");
   };
 
   return (
     <div className="App">
-      <header className="App-header">
-        <div className="login-panel">
-          {loggedInUser() ? (
-              <>
-                <span>Welcome, {loggedInUser()}</span>
-                <Link to="/profile">
-                  <button>Profile</button>
-                </Link>
-                <button onClick={handleLogout}>Logout</button>
-              </>
-          ) : (
-              <>
-                <Link to="/login">
-                  <button>Login</button>
-                </Link>
-                <Link to="/register">
-                  <button>Register</button>
-                </Link>
-              </>
-          )}
-        </div>
-        <h1>Simple Online Store</h1>
-        {loggedInUser() ? (
-          <Link to="/cart">
-            <button>Cart ({totalItems})</button>
+      <nav className="navbar navbar-expand-lg">
+        <div className="container-fluid">
+          <Link to="/" className="d-flex flex-row align-items-center">
+            <img src={logo} className="navbar-img mx-3" alt="logo" />
+            <div className="brand">SimpleStore</div>
           </Link>
-        ) : null}
-      </header>
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <span
+            className="collapse navbar-collapse flex-grow-0"
+            id="navbarSupportedContent"
+          >
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0 d-none d-lg-flex">
+              <li className="nav-item">
+                <OverlayTrigger
+                    placement="bottom"
+                    overlay={<Tooltip id="cart-tooltip">Cart</Tooltip>}
+                  >
+                    <Link
+                      to="/cart"
+                      className="d-flex flex-row align-items-center"
+                    >
+                      <img src={cart} className="navbar-img" alt="cart" />
+                      <div className="cart-badge">{totalItems}</div>
+                    </Link>
+                  </OverlayTrigger>
+              </li>
+              <li className="nav-item d-flex flex-row align-items-center">
+                {loggedInUser() ? (
+                  <OverlayTrigger
+                    placement="bottom"
+                    overlay={<Tooltip id="profile-tooltip">Profile</Tooltip>}
+                  >
+                    <Link
+                      to="/profile"
+                      className="d-flex align-items-center"
+                    >
+                      <img src={user} className="navbar-img" alt="user" />
+                    </Link>
+                  </OverlayTrigger>
+                ) : (
+                  <OverlayTrigger
+                    placement="bottom"
+                    overlay={<Tooltip id="login-tooltip">Login</Tooltip>}
+                  >
+                    <Link to="/login">
+                      <img src={user} className="navbar-img me-2" alt="login" />
+                    </Link>
+                  </OverlayTrigger>
+                )}
+              </li>
+            </ul>
+            <ul className="navbar-nav d-lg-none">
+            <li className="nav-item">
+            {loggedInUser() ? (
+              <Link to="/cart" className="nav-link d-flex flex-row align-items-center">
+                <img src={cart} className="navbar-img" alt="cart" />
+                <span className="ms-2 align-self-center">Cart</span>
+              </Link>
+            ) : null}
+            </li>
+            <li className="nav-item">
+              {loggedInUser() ? (
+                <Link to="/profile" className="nav-link d-flex flex-row align-items-center">
+                  <img src={user} className="navbar-img" alt="user" />
+                  <span className="ms-2 align-self-center">Profile</span>
+                </Link>
+              ) : (
+                <Link to="/login" className="nav-link d-flex flex-row align-items-center">
+                  <img src={user} className="navbar-img" alt="login" />
+                  <span className="ms-2 align-self-center">Login</span>
+                </Link>
+              )}
+            </li>
+          </ul>
+          </span>
+        </div>
+      </nav>
       <main>
         <Routes>
           <Route
@@ -248,8 +316,9 @@ const App: React.FC = () => {
                 updateShippingInfo={updateShippingInfo}
                 shippingInfo={shippingInfo}
                 loadCart={loadCart}
-                orders={orders}
-              />
+                orders={orders} // Przekaż zamówienia
+                handleLogout={handleLogout} // Przekaż funkcję wylogowania          
+                />
             }
           />
           <Route
@@ -267,28 +336,50 @@ const App: React.FC = () => {
             path="/"
             element={
               <>
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <div className="search-bar mb-4">
+                  <input
+                    type="text"
+                    className="form-control w-100"
+                    placeholder="Search products..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
                 {loading ? (
                   <p>Loading products...</p>
                 ) : (
-                  <div className="product-list">
+                  <div className="row">
                     {filteredProducts.map((product) => (
-                      <div key={product.id} className="product-card">
-                        <img src={product.image} alt={product.title} />
-                        <h2>{product.title}</h2>
-                        <p>{product.description}</p>
-                        <p>${product.price}</p>
-                        <Link to={`/product/${product.id}`}>
-                          <button>View Product</button>
-                        </Link>
-                        <button onClick={() => addToCart(product, 1)}>
-                          Add to Cart
-                        </button>
+                      <div key={product.id} className="col-md-4 mb-4">
+                        <div className="card h-100">
+                          <div className="card-img-container">
+                            <img
+                              src={product.image}
+                              className="card-img-top img-fluid p-3"
+                              alt={product.title}
+                            />
+                          </div>
+                          <div className="card-divider"></div>
+                          <div className="card-body d-flex flex-column">
+                            <h5 className="card-title">{product.title}</h5>
+                            <p className="card-text">{product.description}</p>
+                            <div className="mt-auto">
+                            <p className="card-text h5">${product.price}</p>
+                              <Link
+                                to={`/product/${product.id}`}
+                                className="btn btn-primary w-100 mb-2"
+                              >
+                                View Product
+                              </Link>
+                              <button
+                                className="btn btn-secondary w-100 ms-0 mt-0"
+                                onClick={() => addToCart(product, 1)}
+                              >
+                                Add to Cart
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>

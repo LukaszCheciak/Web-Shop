@@ -23,12 +23,41 @@ const Login: React.FC = () => {
 };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      <button onClick={handleLogin}>Login</button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-body d-flex flex-column align-items-center">
+              <h1 className="text-center">Login</h1>
+              <div className="mb-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="username"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="mb-2">
+                <input
+                  type="password"
+                  className="form-control"
+                  id="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              {error && <p className="text-danger text-center">{error}</p>}
+              <button className="btn btn-primary w-100 mb-3" onClick={handleLogin}>Login</button>
+              {error && <p style={{ color: 'red' }}>{error}</p>}
+              <button className="btn btn-secondary w-100 mb-3" onClick={() => navigate("/")}>Back to Store</button>
+              <button className="btn btn-secondary w-100" onClick={() => navigate("/cart")}>Go to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,0 +1,23 @@
+.container {
+  max-width: 50rem;
+}
+
+.card {
+  margin-bottom: 1.25rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card-text {
+  margin-bottom: 0.625rem;
+}
+
+h1, h2, h3, h4 {
+  margin-bottom: 1.25rem;
+}
+
+button {
+  margin-top: 0.625rem;
+}
